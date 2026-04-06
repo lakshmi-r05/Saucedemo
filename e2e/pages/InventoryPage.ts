@@ -2,12 +2,12 @@ import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class InventoryPage extends BasePage {
-  // 🔹 Page elements
+  // Page elements
   readonly title: Locator;
   readonly inventoryItems: Locator;
   readonly cartIcon: Locator;
 
-  // 🔹 Product specific (example)
+  // Product specific (example)
   readonly backpackAddToCartBtn: Locator;
   readonly bikeLightAddToCartBtn: Locator;
 
@@ -24,7 +24,7 @@ export class InventoryPage extends BasePage {
     this.bikeLightAddToCartBtn = page.getByTestId('add-to-cart-sauce-labs-bike-light');
   }
 
-  // 🔹 Actions
+  // Actions
   async addBackpackToCart() {
     await this.backpackAddToCartBtn.click();
   }
@@ -37,7 +37,7 @@ export class InventoryPage extends BasePage {
     await this.cartIcon.click();
   }
 
-  // 🔹 Utility methods
+  //Utility methods
   async getInventoryCount(): Promise<number> {
     return await this.inventoryItems.count();
   }
