@@ -1,9 +1,16 @@
 import { test, expect } from '../../utils/baseTest';
 import { SortOptions, Routes } from '../../utils/constants';
+import { TestData } from '../../utils/testData';
 
 test.describe('SauceDemo Sorting Tests', () => {
+  test.beforeEach(async ({ loginPage }) => {
+  const user = TestData.getUser('STANDARD');
 
-  test('SC01 - Sort Name A-Z', async ({ inventoryPage }) => {
+  await loginPage.navigateToLoginPage();
+  await loginPage.login(user.username, user.password);
+});
+
+  test('Sort Name A-Z', async ({ inventoryPage }) => {
     await inventoryPage.sortBy(SortOptions.NAME_ASC);
 
     const names = await inventoryPage.getItemNames();
@@ -12,7 +19,7 @@ test.describe('SauceDemo Sorting Tests', () => {
     expect(names).toEqual(sorted);
   });
 
-  test('SC02 - Sort Name Z-A', async ({ inventoryPage }) => {
+  test('Sort Name Z-A', async ({ inventoryPage }) => {
     await inventoryPage.sortBy(SortOptions.NAME_DESC);
 
     const names = await inventoryPage.getItemNames();
@@ -21,7 +28,7 @@ test.describe('SauceDemo Sorting Tests', () => {
     expect(names).toEqual(sorted);
   });
 
-  test('SC03 - Sort Price Low to High', async ({ inventoryPage }) => {
+  test('Sort Price Low to High', async ({ inventoryPage }) => {
     await inventoryPage.sortBy(SortOptions.PRICE_LOW_HIGH);
 
     const prices = await inventoryPage.getItemPrices();
@@ -30,7 +37,7 @@ test.describe('SauceDemo Sorting Tests', () => {
     expect(prices).toEqual(sorted);
   });
 
-  test('SC04 - Sort Price High to Low', async ({ inventoryPage }) => {
+  test('Sort Price High to Low', async ({ inventoryPage }) => {
     await inventoryPage.sortBy(SortOptions.PRICE_HIGH_LOW);
 
     const prices = await inventoryPage.getItemPrices();
@@ -39,7 +46,7 @@ test.describe('SauceDemo Sorting Tests', () => {
     expect(prices).toEqual(sorted);
   });
 
-  test('SC05 - Sorting resets after navigation', async ({ inventoryPage }) => {
+  test('Sorting resets after navigation', async ({ inventoryPage }) => {
     await inventoryPage.sortBy(SortOptions.NAME_DESC);
 
     await inventoryPage.openFirstItem();
@@ -51,7 +58,7 @@ test.describe('SauceDemo Sorting Tests', () => {
     expect(names).toEqual(defaultSorted);
   });
 
-  test('SC06 - Sorting unaffected after Add to Cart', async ({ inventoryPage }) => {
+  test('Sorting unaffected after Add to Cart', async ({ inventoryPage }) => {
     await inventoryPage.sortBy(SortOptions.NAME_DESC);
 
     const before = await inventoryPage.getItemNames();
@@ -66,7 +73,7 @@ test.describe('SauceDemo Sorting Tests', () => {
     expect(after).toEqual(before);
   });
 
-  test('SC07 - Sorting Reset after refresh', async ({ inventoryPage, page }) => {
+  test('Sorting Reset after refresh', async ({ inventoryPage, page }) => {
     await inventoryPage.sortBy(SortOptions.NAME_DESC);
 
     await page.reload();
@@ -77,7 +84,7 @@ test.describe('SauceDemo Sorting Tests', () => {
     expect(names).toEqual(defaultSorted);
   });
 
-  test('SC08 - Sorting dropdown reflects selected option', async ({ inventoryPage }) => {
+  test('Sorting dropdown reflects selected option', async ({ inventoryPage }) => {
     await inventoryPage.sortBy(SortOptions.PRICE_HIGH_LOW);
 
     await expect(inventoryPage.sortDropdown)
@@ -89,7 +96,7 @@ test.describe('SauceDemo Sorting Tests', () => {
       .toHaveValue(SortOptions.NAME_DESC);
   });
 
-  test('SC09 - Sorting does not change product count', async ({ inventoryPage }) => {
+  test('Sorting does not change product count', async ({ inventoryPage }) => {
     const countBefore = await inventoryPage.getInventoryCount();
 
     await inventoryPage.sortBy(SortOptions.NAME_ASC);
@@ -104,7 +111,7 @@ test.describe('SauceDemo Sorting Tests', () => {
 
 test.describe('Unauthenticated tests', () => {
 
- test('SC10 - Access inventory without login redirects to login page', async ({ page }) => {
+ test('Access inventory without login redirects to login page', async ({ page }) => {
 
   await page.goto(Routes.BASE_URL + Routes.INVENTORY);
 

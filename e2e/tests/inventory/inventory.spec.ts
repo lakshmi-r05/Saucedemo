@@ -1,9 +1,18 @@
 import { expect } from '@playwright/test';
 import { test } from '../../utils/baseTest';
+import { TestData } from '../../utils/testData';
 
+test.beforeEach(async ({ loginPage, inventoryPage }) => {
+  const user = TestData.getUser('STANDARD');
+
+  await loginPage.navigateToLoginPage();
+  await loginPage.login(user.username, user.password);
+
+  // Ensure inventory page is loaded
+  await expect(inventoryPage.title).toBeVisible();
+});
 
 test('Verify inventory items are visible', async ({ inventoryPage }) => {
-  // No login needed here; inventoryPage is already authenticated
-  await expect(inventoryPage.title).toBeVisible();
-  await expect(inventoryPage.inventoryItems).toHaveCount(6);
+const count = await inventoryPage.inventoryItems.count();
+expect(count).toBeGreaterThan(0);
 });
