@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { Routes } from '../utils/constants';
 
 export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
@@ -19,14 +20,16 @@ export class LoginPage extends BasePage {
     await this.passwordInput.fill(password);
     await this.loginBtn.click();
   }
-
   async navigateToLoginPage() {
-  await this.page.goto('/');
-}
+    await this.page.goto(`${Routes.BASE_URL}${Routes.LOGIN}`);
+  }
+ // Optional: wait for navigation after login (NO expect)
+  async waitForInventoryPage() {
+    await this.page.waitForURL(new RegExp(Routes.INVENTORY));
+  }
 
- 
-  async expectToBeOnInventoryPage() {
-    await this.page.waitForURL(/inventory/);
-    
+  // Optional: check visibility (no assertions)
+  async isLoginButtonVisible(): Promise<boolean> {
+    return await this.loginBtn.isVisible();
   }
 }

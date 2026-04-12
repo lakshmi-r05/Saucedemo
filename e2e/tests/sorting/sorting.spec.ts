@@ -1,0 +1,115 @@
+import { test, expect } from '../../utils/baseTest';
+import { SortOptions, Routes } from '../../utils/constants';
+
+test.describe('SauceDemo Sorting Tests', () => {
+
+  test('SC01 - Sort Name A-Z', async ({ inventoryPage }) => {
+    await inventoryPage.sortBy(SortOptions.NAME_ASC);
+
+    const names = await inventoryPage.getItemNames();
+    const sorted = [...names].sort();
+
+    expect(names).toEqual(sorted);
+  });
+
+  test('SC02 - Sort Name Z-A', async ({ inventoryPage }) => {
+    await inventoryPage.sortBy(SortOptions.NAME_DESC);
+
+    const names = await inventoryPage.getItemNames();
+    const sorted = [...names].sort().reverse();
+
+    expect(names).toEqual(sorted);
+  });
+
+  test('SC03 - Sort Price Low to High', async ({ inventoryPage }) => {
+    await inventoryPage.sortBy(SortOptions.PRICE_LOW_HIGH);
+
+    const prices = await inventoryPage.getItemPrices();
+    const sorted = [...prices].sort((a, b) => a - b);
+
+    expect(prices).toEqual(sorted);
+  });
+
+  test('SC04 - Sort Price High to Low', async ({ inventoryPage }) => {
+    await inventoryPage.sortBy(SortOptions.PRICE_HIGH_LOW);
+
+    const prices = await inventoryPage.getItemPrices();
+    const sorted = [...prices].sort((a, b) => b - a);
+
+    expect(prices).toEqual(sorted);
+  });
+
+  test('SC05 - Sorting resets after navigation', async ({ inventoryPage }) => {
+    await inventoryPage.sortBy(SortOptions.NAME_DESC);
+
+    await inventoryPage.openFirstItem();
+    await inventoryPage.goBack();
+
+    const names = await inventoryPage.getItemNames();
+    const defaultSorted = [...names].sort();
+
+    expect(names).toEqual(defaultSorted);
+  });
+
+  test('SC06 - Sorting unaffected after Add to Cart', async ({ inventoryPage }) => {
+    await inventoryPage.sortBy(SortOptions.NAME_DESC);
+
+    const before = await inventoryPage.getItemNames();
+    const sorted = [...before].sort().reverse();
+
+    expect(before).toEqual(sorted);
+
+    await inventoryPage.addFirstItemToCart();
+
+    const after = await inventoryPage.getItemNames();
+
+    expect(after).toEqual(before);
+  });
+
+  test('SC07 - Sorting Reset after refresh', async ({ inventoryPage, page }) => {
+    await inventoryPage.sortBy(SortOptions.NAME_DESC);
+
+    await page.reload();
+
+    const names = await inventoryPage.getItemNames();
+    const defaultSorted = [...names].sort();
+
+    expect(names).toEqual(defaultSorted);
+  });
+
+  test('SC08 - Sorting dropdown reflects selected option', async ({ inventoryPage }) => {
+    await inventoryPage.sortBy(SortOptions.PRICE_HIGH_LOW);
+
+    await expect(inventoryPage.sortDropdown)
+      .toHaveValue(SortOptions.PRICE_HIGH_LOW);
+
+    await inventoryPage.sortBy(SortOptions.NAME_DESC);
+
+    await expect(inventoryPage.sortDropdown)
+      .toHaveValue(SortOptions.NAME_DESC);
+  });
+
+  test('SC09 - Sorting does not change product count', async ({ inventoryPage }) => {
+    const countBefore = await inventoryPage.getInventoryCount();
+
+    await inventoryPage.sortBy(SortOptions.NAME_ASC);
+
+    const countAfter = await inventoryPage.getInventoryCount();
+
+    expect(countAfter).toBe(countBefore);
+  });
+
+});
+
+
+test.describe('Unauthenticated tests', () => {
+
+ test('SC10 - Access inventory without login redirects to login page', async ({ page }) => {
+
+  await page.goto(Routes.BASE_URL + Routes.INVENTORY);
+
+  // SauceDemo redirects unauthenticated users to login page (root URL)
+  await expect(page).toHaveURL(Routes.BASE_URL + Routes.LOGIN);
+});
+
+});
