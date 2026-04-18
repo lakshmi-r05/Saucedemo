@@ -11,6 +11,9 @@ test('Pricing consistency across Inventory → Cart → Checkout', async ({
 
   const user = TestData.getUser("STANDARD");
 
+  // 🔥 dynamic checkout data
+  const { firstName, lastName, zip } = TestData.getCheckoutData();
+
   // Login
   await loginPage.navigateToLoginPage();
   await loginPage.login(user.username, user.password);
@@ -18,14 +21,12 @@ test('Pricing consistency across Inventory → Cart → Checkout', async ({
   // -------- INVENTORY --------
   const item = inventoryPage.inventoryItems.first();
 
-  const invName = await item.locator('[data-test="inventory-item-name"]').textContent();
-  const invPrice = await item.locator('[data-test="inventory-item-price"]').textContent();
+  const invName = await item.getByTestId('inventory-item-name').textContent();
+  const invPrice = await item.getByTestId('inventory-item-price').textContent();
 
-  // Safety check (avoid null)
   expect(invName).not.toBeNull();
   expect(invPrice).not.toBeNull();
 
-  // Add item
   await inventoryPage.addBackpackToCart();
 
   // -------- CART --------
@@ -33,8 +34,8 @@ test('Pricing consistency across Inventory → Cart → Checkout', async ({
 
   const cartItem = cartPage.cartItems.first();
 
-  const cartName = await cartItem.locator('[data-test="inventory-item-name"]').textContent();
-  const cartPrice = await cartItem.locator('[data-test="inventory-item-price"]').textContent();
+  const cartName = await cartItem.getByTestId('inventory-item-name').textContent();
+  const cartPrice = await cartItem.getByTestId('inventory-item-price').textContent();
 
   expect(cartName).toBe(invName);
   expect(cartPrice).toBe(invPrice);
@@ -42,14 +43,13 @@ test('Pricing consistency across Inventory → Cart → Checkout', async ({
   // -------- CHECKOUT --------
   await cartPage.clickCheckout();
 
-  await checkOutPage.fillUserDetails('John', 'Doe', '560001');
+  await checkOutPage.fillUserDetails(firstName, lastName, zip);
   await checkOutPage.clickContinue();
 
-  // Reuse same locator (no change to CheckoutPage)
   const checkoutItem = cartPage.cartItems.first();
 
-  const checkoutName = await checkoutItem.locator('[data-test="inventory-item-name"]').textContent();
-  const checkoutPrice = await checkoutItem.locator('[data-test="inventory-item-price"]').textContent();
+  const checkoutName = await checkoutItem.getByTestId('inventory-item-name').textContent();
+  const checkoutPrice = await checkoutItem.getByTestId('inventory-item-price').textContent();
 
   expect(checkoutName).toBe(invName);
   expect(checkoutPrice).toBe(invPrice);

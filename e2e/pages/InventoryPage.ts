@@ -16,6 +16,7 @@ export class InventoryPage extends BasePage {
   readonly sortDropdown: Locator;
   readonly itemNames: Locator;
   readonly itemPrices: Locator;
+  readonly cartBadge: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -33,8 +34,8 @@ export class InventoryPage extends BasePage {
 this.sortDropdown = page.locator('.product_sort_container');
     this.itemNames = page.getByTestId('inventory-item-name');
     this.itemPrices = page.getByTestId('inventory-item-price');
-  }
-
+  
+this.cartBadge = page.locator('.shopping_cart_badge');}
   // ===== Existing Actions (UNCHANGED) =====
 
   async addBackpackToCart() {
@@ -92,4 +93,14 @@ this.sortDropdown = page.locator('.product_sort_container');
       .getByRole('button', { name: /add to cart/i })
       .click();
   }
+  async getCartCount(): Promise<number> {
+  if (await this.cartBadge.isVisible()) {
+    const text = await this.cartBadge.textContent();
+    return Number(text);
+  }
+  return 0;
+}
+async getCurrentUrl(): Promise<string> {
+  return this.page.url();
+}
 }

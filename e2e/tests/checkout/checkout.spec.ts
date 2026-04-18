@@ -10,18 +10,11 @@ test('Successful Order Placement', async ({
 }) => {
 
   const user = TestData.getUser("STANDARD");
-
-  // Login
+  const checkoutData = TestData.getCheckoutData();
   await loginPage.navigateToLoginPage();
   await loginPage.login(user.username, user.password);
-
-  // Validate inventory page
   expect(await inventoryPage.isLoaded()).toBe(true);
-
-  // Add product
   await inventoryPage.addBackpackToCart();
-
-  // Go to cart (use BasePage method)
   await inventoryPage.goToCart();
 
   // Validate item added
@@ -31,10 +24,13 @@ test('Successful Order Placement', async ({
   // Checkout
   await cartPage.clickCheckout();
 
-  // Fill details
-  await checkOutPage.fillUserDetails('John', 'Doe', '560001');
   
-  //Clicking continue after filling details
+  await checkOutPage.fillUserDetails(
+    checkoutData.firstName,
+    checkoutData.lastName,
+    checkoutData.zip
+  );
+
   await checkOutPage.clickContinue();
 
   // Finish order
